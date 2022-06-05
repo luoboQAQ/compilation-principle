@@ -1,158 +1,135 @@
 //词法分析程序
-#include <cstdio>
-#include <cstring>
+#include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
-const int NUMBER = 300;
-const int STRING_LENGTH = 4000;
-const int LENGTH = 40;
-
-//储存单词表
-struct
-{
-    char sign[10];
+//单词
+struct word {
+    string sign;
     int code;
-} symbol[NUMBER];
 
-// 储存关键字的表
-struct
-{
-    char symbol[30];
-    char code[5];
-} propertytable[NUMBER];
+    word() : sign(""), code(0){};
+    word(string s, int c) : sign(s), code(c){};
+};
+//单词表
+vector<word> symbol;
 
-//储存字符串变量的表
-struct
-{
-    char name[10];
-    char cat[10];
-    char type[10];
+//关键字
+struct property {
+    string symbol;
+    string code;
+};
+//关键字表
+vector<property> propertytable;
+
+//字符串变量
+struct sign {
+    string name;
+    string cat;
+    string type;
     int value;
-} signtable[1150];
 
-int propertytable_count = 0, signtable_count = 0, symbol_count = 0, type = 1;
+    sign() : name(""), cat(""), type(""), value(0){};
+    sign(string n) : name(n), cat(""), type(""), value(0){};
+    sign(string n, string c, string t, int v) : name(n), cat(c), type(t), value(v){};
+};
+//字符串变量表
+vector<sign> signtable;
 
-//把数字字符串转化为整数
-int changestring(char *p) {
-    int i, num = 0;
-    for (i = 0; p[i] != '\0'; i++) {
-        num = num * 10 + p[i] - '0';
-    }
-    return num;
-}
+bool type = true;
 
-int findcreate(char *p) {
+int findcreate(string& p) {
     int i;
-    for (i = 0; i < signtable_count; i++) {
-        if (strcmp(signtable[i].name, p) == 0) {
-            strcpy(symbol[symbol_count].sign, p);
-            symbol[symbol_count++].code = 1;
+    for (i = 0; i < (int)signtable.size(); i++) {
+        if (signtable[i].name == p) {
+            symbol.emplace_back(word(p, 1));
             return 0;
         }
     }
-    if (i == signtable_count && type)  // 表示字符串常量表中没有单词p,就把p存储到字符串常量表和单词表中
-    {
-        strcpy(symbol[symbol_count].sign, p);
-        symbol[symbol_count++].code = 1;
-        strcpy(signtable[signtable_count++].name, p);
+    // 字符串常量表中没有单词p,就把p存储到字符串常量表和单词表中
+    if (i == (int)signtable.size() && type) {
+        symbol.emplace_back(word(p, 1));
+        signtable.emplace_back(sign(p));
     }
-    if (type == 0) {
-        printf("%snot defined\n", p);
-    }
+    if (!type)
+        cout << p << "未定义!" << endl;
     return 0;
 }
 
-void find(char *p) {
-    int i, num = 0;
-    if (*p >= '0' && *p <= '9')  //整数
-    {
-        for (i = 0; p[i] != '\0'; i++) {
-            num = num * 10 + p[i] - '0';
-            symbol[symbol_count].sign[i] = p[i];
-        }
-        symbol[symbol_count].sign[i] = '\0';
-        symbol[symbol_count++].code = 2;
+void find(string& p) {
+    int i;
+    //整数
+    if (p[0] >= '0' && p[0] <= '9') {
+        // num = atoi(p.c_str());
+        symbol.emplace_back(word(p, 2));
     } else {
-        for (i = 0; i < propertytable_count; i++) {
-            if (strcmp(propertytable[i].symbol, p) == 0) {
-                strcpy(symbol[symbol_count].sign, p);
-                symbol[symbol_count++].code = changestring(propertytable[i].code);
+        for (i = 0; i < (int)propertytable.size(); i++) {
+            if (propertytable[i].symbol == p) {
+                symbol.emplace_back(word(p, atoi(propertytable[i].code.c_str())));
                 break;
             }
         }
-        if (i == propertytable_count) {
-            if (*p >= 'A' && *p <= 'Z' || *p >= 'a' && *p <= 'z')  //如果符合就是字符串常量
-            {
+        if (i == (int)propertytable.size()) {
+            //如果符合就是字符串常量
+            if (isalpha(p[0]))
                 findcreate(p);
-            } else if (*p >= 32) {
-                strcpy(symbol[symbol_count].sign, p);
-                symbol[symbol_count++].code = 0;
-            }
+            else if (p[0] >= 32)
+                symbol.emplace_back(word(p, p[0]));
         }
     }
 }
 
-void Test(char *p) {
-    int k;
-    char word[30];
-    while (*p != '\0') {
-        if (*p >= 'A' && *p <= 'Z' || *p >= 'a' && *p <= 'z')  // 判断单词是否为字符串
-        {
-            k = 0;
-            word[k++] = *p;
+void Test(string& code) {
+    string word;
+    string::iterator p = code.begin();
+    while (p < code.end()) {
+        if (isalpha(*p)) {
+            // 判断单词是否为字符串
+            word.clear();
+            word += *p;
             p++;
-            while (*p >= 'A' && *p <= 'Z' || *p >= 'a' && *p <= 'z' || *p >= '0' && *p <= '9' || *p == '_') {
-                word[k++] = *p;
+            while (isalnum(*p) || *p == '_') {
+                word += *p;
                 p++;
             }
-            word[k] = '\0';
-            if (strcmp(word, "int") == 0 || strcmp(word, "float") == 0 || strcmp(word, "char") == 0) {
-                type = 1;  // 为1代表int float char 类型的字符串变量
-            }
+            if (word == "int" || word == "float" || word == "char")
+                // 为1代表int float char 类型的字符串变量
+                type = true;
             find(word);
-        } else if (*p >= '0' && *p <= '9')  //判断单词是否为整数
-        {
-            k = 0;
-            word[k++] = *p;
+        } else if (*p >= '0' && *p <= '9') {
+            //判断单词是否为整数
+            word.clear();
+            word += *p;
             p++;
             while (*p >= '0' && *p <= '9') {
-                word[k++] = *p;
+                word += *p;
                 p++;
             }
-            word[k] = '\0';
             find(word);
         } else if (*p == '<' || *p == '>' || *p == '=' || *p == '!' || *p == '&' || *p == '|') {
-            k = 0;
-            word[k++] = *p;
+            word.clear();
+            word += *p;
             p++;
-            if (*(p - 1) == '&') {
-                if (*p == '&') {
-                    word[k++] = *p;
-                    p++;
-                }
-            } else if (*(p - 1) == '|') {
-                if (*p == '|') {
-                    word[k++] = *p;
-                    p++;
-                }
-            } else {
-                if (*p == '=') {
-                    word[k++] = *p;
-                    p++;
-                }
+            if (*(p - 1) == '&' && *p == '&') {
+                word += *p;
+                p++;
+            } else if (*(p - 1) == '|' && *p == '|') {
+                word += *p;
+                p++;
+            } else if (*p == '=') {
+                word += *p;
+                p++;
             }
-            word[k] = '\0';
             find(word);
         } else if (*p == ' ') {
             p++;
         } else {
-            k = 0;
-            word[k++] = *p;
-            word[k] = '\0';
-            if (strcmp(word, ";") == 0) {
-                type = 0;
+            word.clear();
+            word += *p;
+            if (word == ";") {
+                type = false;
             }
             p++;
             find(word);
@@ -160,48 +137,53 @@ void Test(char *p) {
     }
 }
 
-// 把关键字表中的symbol 和 code输入到propertytable结构体中
-void Create() {
-    int i = 0;
-    FILE *fp;
-    if ((fp = fopen("D:\\Code\\C++\\CompilationPrinciple\\keyword.txt", "r")) == NULL) {
-        printf("keyword.txt not found");
+string prefix;
+
+// 把关键字表中的symbol和code输入到propertytable结构体中
+void loadProperty() {
+    ifstream fin(prefix + "keyword.txt");
+    if (!fin.is_open()) {
+        cout << "无法找到关键字表" << endl;
         return;
     }
-    while (!feof(fp)) {
-        fscanf(fp, "%s %s", propertytable[i++].symbol, propertytable[i].code);
-        propertytable_count++;
+    property p;
+    while (!fin.eof()) {
+        fin >> p.symbol >> p.code;
+        propertytable.emplace_back(p);
     }
-    fclose(fp);  // 关闭文件
+    // 关闭文件
+    fin.close();
 }
 
 void Finput() {
-    int i = 0;
-    char ch;
-    char string[STRING_LENGTH];  // C语言程序文本字符串
-    char file[LENGTH];           // 文件名称字符串
-    FILE *fp;
-    printf("input filename:");
-    scanf("%s", file);
-    if ((fp = fopen(file, "rb")) == NULL) {
-        printf("file not found");
+    // 文件名称字符串
+    string file;
+    ifstream fin;
+    cout << "请输入文件名称：";
+    cin >> file;
+    fin.open(prefix + file);
+    if (!fin.is_open()) {
+        cout << "无法打开文件" << endl;
         return;
     }
-    ch = fgetc(fp);
-    while (ch != EOF)  // 判断程序是否读完
-    {
-        string[i++] = ch;
-        ch = fgetc(fp);
-    }
-    string[i] = '\0';  // 作为程序字符串结尾标识
-    printf("c program is :\n");
-    printf("%s\n", string);
-    Test(string);  // 对程序进行词法分析
+    // C语言程序文本字符串
+    string code((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
+    fin.close();
+    cout << "C语言程序文本为:" << endl;
+    cout << code << endl;
+    // 对程序进行词法分析
+    Test(code);
 }
 
-int main() {
-    Create();
+int main(int argc, char* argv[]) {
+    if (argc >= 2)
+        prefix = argv[1];
+    loadProperty();
     Finput();
+    cout << "词法分析结果为：" << endl;
+    for (int i = 0; i < (int)symbol.size(); i++) {
+        cout << symbol[i].sign << " " << symbol[i].code << endl;
+    }
     system("pause");
     return 0;
 }
