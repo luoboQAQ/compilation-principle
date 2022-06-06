@@ -1,47 +1,29 @@
 //递归下降分析程序
-#include <cstdio>
-#include <cstring>
 #include <iostream>
+#include <string>
 using namespace std;
-char a[80];
+
+string code;
 char sym;
-int i = 0;
+int i;
 
 void E();
 void E1();
 void T();
 void T1();
 void F();
-void input();
 void Scaner();
 void Error();
 
-void input() {
-    puts("输入需要分析的字符串（以#键结尾）:");
-    cin >> a;
-}
-
 void Scaner() {
-    sym = a[i];
+    sym = code[i];
     i++;
 }
 
 void Error() {
     cout << "Error" << endl;
+    system("pause");
     exit(0);
-}
-
-main() {
-    while (1) {
-        input();
-        Scaner();
-        E();
-        if (sym == '#')
-            printf("此字符串是该文法的字符串!\n");
-        else
-            printf("Error!\n");
-        i = 0;
-    }
 }
 
 void E() {
@@ -84,4 +66,19 @@ void F() {
         Scaner();
     else
         Error();
+}
+
+int main() {
+    while (1) {
+        i = 0;
+        cout << "输入需要分析的字符串（以#键结尾）:";
+        cin >> code;
+        Scaner();
+        E();
+        if (sym == '#')
+            cout << "此字符串是该文法的字符串!" << endl;
+        else
+            cout << "Error!" << endl;
+    }
+    return 0;
 }
