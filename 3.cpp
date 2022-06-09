@@ -1,157 +1,148 @@
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#define STACK_INIT_SIZE 100
-#define STACKINCREMENT 10
-#define ERROR 0
-#define OK 1
-//********************************************Õ»Ä£¿é
-typedef struct SqStack1  //ÔËËãÊýÕ»
-{
-    int *base;
-    int *top;
-    int stacksize;
-} SqStack1;
-typedef struct SqStack2  //ÔËËã·ûÕ»
-{
-    char *base;
-    char *top;
-    int stacksize;
-} SqStack2;
-void IntInitStack(SqStack1 *S) {
-    S->base = (int *)malloc(STACK_INIT_SIZE * sizeof(int));
-    if (!S->base)
-        exit(ERROR);
-    S->top = S->base;
-    S->stacksize = STACK_INIT_SIZE;
-}
-void CharInitStack(SqStack2 *S) {
-    S->base = (char *)malloc(STACK_INIT_SIZE * sizeof(char));
-    if (!S->base)
-        exit(ERROR);
-    S->top = S->base;
-    S->stacksize = STACK_INIT_SIZE;
-}
-int IntGetTop(SqStack1 *S)  //È¡Õ»¶¥ÔªËØ
-{
-    int e;
-    if ((*S).top == (*S).base)
-        return 0;
-    e = *((*S).top - 1);
-    return e;
-}
-char CharGetTop(SqStack2 *S)  //È¡Õ»¶¥ÔªËØ
-{
-    char e;
-    if ((*S).top == (*S).base)
-        return 0;
-    e = *((*S).top - 1);
-    return e;
-}
-int IntPush(SqStack1 *S, int e) {
-    *(*S).top++ = e;
-    return OK;
-}
-int CharPush(SqStack2 *S, char e) {
-    *(*S).top++ = e;
-    return OK;
-}
+#include <iostream>
+#include <stack>
+#include <vector>
+using namespace std;
 
-int IntPop(SqStack1 *S) {
-    int e;
-    if ((*S).top == (*S).base)
+class IntStack : public stack<int> {
+public:
+    int myPop() {
+        if (this->empty())
+            return 0;
+        int value = this->top();
+        this->pop();
+        return value;
+    };
+    int getTop() {
+        if (this->empty())
+            return 0;
+        return this->top();
+    };
+};
+
+class CharStack : public stack<char> {
+public:
+    char myPop() {
+        if (this->empty())
+            return 0;
+        char value = this->top();
+        this->pop();
+        return value;
+    };
+    char getTop() {
+        if (this->empty())
+            return 0;
+        return this->top();
+    };
+};
+
+class PrioFunct {
+private:
+    vector<int> f, g;
+    vector<char> title;
+    int getIndex(char a) {
+        for (int i = 0; i < (int)title.size(); i++) {
+            if (title[i] == a)
+                return i;
+        }
         return 0;
-    e = *--(*S).top;
-    return e;
-}
-int CharPop(SqStack2 *S) {
-    char e;
-    if ((*S).top == (*S).base)
-        return 0;
-    e = *--(*S).top;
-    return e;
-}
-//¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª*******************ÔËËãÄ£¿é
-char Precede(char a, char b)  //ÔËËãÓÅÏÈ¼¶ÅÐ¶Ï
-{
+    }
+
+public:
+    bool build(vector<vector<char>>& table) {
+        int n = table.size();
+        if (n == 0)
+            return false;
+        f.resize(n + 1);
+        g.resize(n + 1);
+        for (int i = 0; i <= n; i++) {
+            f[i] = 1;
+            g[i] = 1;
+        }
+        title = table[0];
+        bool isChanged = true;
+        bool isValid = false;
+        int end = 2 * n + 1;
+        while (isChanged && !isValid) {
+            isChanged = false;
+            for (int i = 1; i < n; i++)
+                for (int j = 1; j < n; j++) {
+                    switch (table[i][j]) {
+                    case '>':
+                        if (f[i] <= g[j]) {
+                            f[i] = g[j] + 1;
+                            isChanged = true;
+                        }
+                        break;
+                    case '<':
+                        if (f[i] >= g[j]) {
+                            g[j] = f[i] + 1;
+                            isChanged = true;
+                        }
+                        break;
+                    case '=':
+                        if (f[i] != g[j]) {
+                            f[i] = g[j] = max(f[i], g[j]);
+                            isChanged = true;
+                        }
+                        break;
+                    }
+                    if (f[i] >= end || g[j] >= end)
+                        isValid = true;
+                }
+        }
+        if (isValid)
+            return false;
+#ifdef MY_DEBUG
+        cout << "f: ";
+        for (int i = 1; i < n; i++)
+            cout << f[i] << " ";
+        cout << endl;
+        cout << "g: ";
+        for (int i = 1; i < n; i++)
+            cout << g[i] << " ";
+        cout << endl;
+#endif
+        return true;
+    }
+
+    char precede(char a, char b) {
+        int i = getIndex(b);
+        int j = getIndex(a);
+        if (f[i] < g[j])
+            return '<';
+        else if (f[i] > g[j])
+            return '>';
+        else
+            return '=';
+    }
+};
+
+//ÓÅÏÈ¼¶±í¸ñ
+vector<vector<char>> Table = {
+    {' ', '+', '-', '*', '/', '(', ')', '#'},
+    {'+', '>', '>', '<', '<', '<', '>', '>'},
+    {'-', '>', '>', '<', '<', '<', '>', '>'},
+    {'*', '>', '>', '>', '>', '<', '>', '>'},
+    {'/', '>', '>', '>', '>', '<', '>', '>'},
+    {'(', '<', '<', '<', '<', '<', '=', ' '},
+    {')', '>', '>', '>', '>', ' ', '>', '>'},
+    {'#', '<', '<', '<', '<', '<', ' ', '='}};
+
+//ÔËËãÓÅÏÈ¼¶ÅÐ¶Ï
+char Precede(char a, char b) {
     int i, j;
-    char Table[8][8] = {
-        ' ',
-        '+',
-        '-',
-        '*',
-        '/',
-        '(',
-        ')',
-        '#',
-        '+',
-        '>',
-        '>',
-        '<',
-        '<',
-        '<',
-        '>',
-        '>',
-        '-',
-        '>',
-        '>',
-        '<',
-        '<',
-        '<',
-        '>',
-        '>',
-        '*',
-        '>',
-        '>',
-        '>',
-        '>',
-        '<',
-        '>',
-        '>',
-        '/',
-        '>',
-        '>',
-        '>',
-        '>',
-        '<',
-        '>',
-        '>',
-        '(',
-        '<',
-        '<',
-        '<',
-        '<',
-        '<',
-        '=',
-        ' ',
-        ')',
-        '>',
-        '>',
-        '>',
-        '>',
-        ' ',
-        '>',
-        '>',
-        '#',
-        '<',
-        '<',
-        '<',
-        '<',
-        '<',
-        ' ',
-        '=',
-    };  //ÓÅÏÈ¼¶±í¸ñ
+    //×Ý×ø±êÑ°ÕÒ
     for (i = 0; i < 8; i++)
-        if (Table[0][i] == a)  //×Ý×ø±êÑ°ÕÒ
+        if (Table[0][i] == a)
             break;
-    for (j = 0; j < 8; j++)  //ºá×ø±êÑ°ÕÒ
+    //ºá×ø±êÑ°ÕÒ
+    for (j = 0; j < 8; j++)
         if (Table[j][0] == b)
             break;
     return Table[j][i];
 }
-int Operate(int a, char theta, int b)  //¼ÆËã±í´ïÊ½Öµ£ºÖ÷ÒªÊÇ½«´óµÄ±í´ïÊ½×ª»¯³ÉÐ¡µÄ±í´ïÊ½½øÐÐÖð²½ÇóÖµ
-{
+//¼ÆËã±í´ïÊ½Öµ£ºÖ÷ÒªÊÇ½«´óµÄ±í´ïÊ½×ª»¯³ÉÐ¡µÄ±í´ïÊ½½øÐÐÖð²½ÇóÖµ
+int Operate(int a, char theta, int b) {
     int c;
     if (theta == '+')
         c = a + b;
@@ -162,68 +153,119 @@ int Operate(int a, char theta, int b)  //¼ÆËã±í´ïÊ½Öµ£ºÖ÷ÒªÊÇ½«´óµÄ±í´ïÊ½×ª»¯³ÉÐ
     else
         c = a / b;
     return c;
-}  // Operate
-int In(char c)  //ÅÐ¶ÏcÊÇ·ñÎª²Ù×÷·û
-{
-    if (c == '(' || c == '+' || c == '-' || c == '*' || c == '/' || c == ')' || c == '#' || c == '^')
-        return 1;  //Èç¹ûÊÇ²Ù×÷·û·µ»Ø1
-    else
-        return 0;  //²»ÊÇ£¬·µ»Ø0
 }
-int result(SqStack1 *OPND, SqStack2 *OPTR)  //ÇóÖµ
-{
+
+//ÅÐ¶ÏcÊÇ·ñÎª²Ù×÷·û
+bool In(char c) {
+    if (c == '(' || c == '+' || c == '-' || c == '*' || c == '/' || c == ')' || c == '#' || c == '^')
+        return true;
+    else
+        return false;
+}
+
+//ÇóÖµ
+int result() {
+    IntStack opnd;
+    CharStack optr;
     char a = 0;
     char theta;
     int b, c, number = 0;
-    IntInitStack(OPND);
-    CharInitStack(OPTR);
-    CharPush(OPTR, '#');
+    optr.emplace('#');
     a = getchar();
-    while (a != '#' || CharGetTop(OPTR) != '#') {
-        printf("ÊäÈë×Ö·û£º%c    ", a);
-        if (!In(a))  //²»ÊÇÔËËã·ûÔò½øÕ»
-        {
+    while (a != '#' || optr.getTop() != '#') {
+        cout << "ÊäÈë×Ö·û£º" << a << "    ";
+        if (!In(a)) {
+            //²»ÊÇÔËËã·ûÔò½øÕ»
             number = 0;
             while (!In(a)) {
-                number = number * 10 + (a - 48);  //´¦Àí¶àÎ»ÕûÊý	z=10*x+y
+                number = number * 10 + (a - 48);
                 a = getchar();
             }
-            IntPush(OPND, number);
-            printf("Ö÷Òª²Ù×÷£ºPush(OPND,%d)       ", number);
+            opnd.emplace(number);
+            cout << "Ö÷Òª²Ù×÷:Push(OPND," << number << ")       " << endl;
         } else
-            switch (Precede(a, CharGetTop(OPTR))) {
+            switch (Precede(a, optr.getTop())) {
             case '<':
-                CharPush(OPTR, a);
+                optr.emplace(a);
                 a = getchar();
-                printf("Ö÷Òª²Ù×÷£ºPush(OPTR,%c)       ", a);
+                cout << "Ö÷Òª²Ù×÷:Push(OPTR," << a << ")       " << endl;
                 break;
             case '=':
-                CharPop(OPTR);
+                optr.myPop();
                 a = getchar();
-                printf("Ö÷Òª²Ù×÷£ºPop(OPTR,%c)        ", a);
+                cout << "Ö÷Òª²Ù×÷:Pop(OPTR," << a << ")       " << endl;
                 break;
             case '>':
-                theta = CharPop(OPTR);
-                c = IntPop(OPND);
-                b = IntPop(OPND);
-                IntPush(OPND, Operate(b, theta, c));
-                printf("Ö÷Òª²Ù×÷£ºOperate(%d,%c,%d)     ", b, theta, c);
+                theta = optr.myPop();
+                c = opnd.myPop();
+                b = opnd.myPop();
+                opnd.emplace(Operate(b, theta, c));
+                printf("Ö÷Òª²Ù×÷:Operate(%d,%c,%d)     \n", b, theta, c);
                 break;
             }
-        printf("OPNDÕ»£º%d  OPTRÕ»£º%c\n", IntGetTop(OPND), CharGetTop(OPTR));
+        cout << "OPNDÕ»:" << opnd.getTop() << "  OPTRÕ»:" << optr.getTop() << endl;
     }
-    printf("\n½á¹û:%d.\n", IntGetTop(OPND));  //´òÓ¡Êä³ö±í´ïÊ½Öµ
-    return OK;
+    //´òÓ¡Êä³ö±í´ïÊ½Öµ
+    printf("\n½á¹û:%d.\n", opnd.getTop());
+    return 0;
 }
-//¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ªÖ÷³ÌÐòÄ£¿é
-main()  //Ö÷º¯Êý£¬Ê¹ÓÃ×Ô¶¨Òåº¯ÊýÍê³É¹¦ÄÜ
-{
-    SqStack1 s1, *OPND;
-    SqStack2 s2, *OPTR;
-    OPND = &s1;
-    OPTR = &s2;
-    printf("ÇëÊäÈëËãÊý±í´ïÊ½²¢ÒÔ'#'½áÎ².\n");
-    printf("ËãÊý±í´ïÊ½:");
-    result(OPND, OPTR);
+
+int resultByFunc() {
+    IntStack opnd;
+    CharStack optr;
+    PrioFunct pf;
+    pf.build(Table);
+    char a = 0;
+    char theta;
+    int b, c, number = 0;
+    optr.emplace('#');
+    a = getchar();
+    while (a != '#' || optr.getTop() != '#') {
+        cout << "ÊäÈë×Ö·û£º" << a << "    ";
+        if (!In(a)) {
+            //²»ÊÇÔËËã·ûÔò½øÕ»
+            number = 0;
+            while (!In(a)) {
+                number = number * 10 + (a - 48);
+                a = getchar();
+            }
+            opnd.emplace(number);
+            cout << "Ö÷Òª²Ù×÷:Push(OPND," << number << ")       " << endl;
+        } else
+            switch (pf.precede(a, optr.getTop())) {
+            case '<':
+                optr.emplace(a);
+                a = getchar();
+                cout << "Ö÷Òª²Ù×÷:Push(OPTR," << a << ")       " << endl;
+                break;
+            case '=':
+                optr.myPop();
+                a = getchar();
+                cout << "Ö÷Òª²Ù×÷:Pop(OPTR," << a << ")       " << endl;
+                break;
+            case '>':
+                theta = optr.myPop();
+                c = opnd.myPop();
+                b = opnd.myPop();
+                opnd.emplace(Operate(b, theta, c));
+                printf("Ö÷Òª²Ù×÷:Operate(%d,%c,%d)     \n", b, theta, c);
+                break;
+            }
+        cout << "OPNDÕ»:" << opnd.getTop() << "  OPTRÕ»:" << optr.getTop() << endl;
+    }
+    //´òÓ¡Êä³ö±í´ïÊ½Öµ
+    printf("\n½á¹û:%d.\n", opnd.getTop());
+    return 0;
+}
+
+int main() {
+    cout << "[Ê¹ÓÃÓÅÏÈ±í]ÇëÊäÈëËãÊý±í´ïÊ½²¢ÒÔ'#'½áÎ²" << endl;
+    result();
+    //ÂËµô»Ø³µ
+    getchar();
+
+    cout << "[Ê¹ÓÃÓÅÏÈº¯Êý]ÇëÊäÈëËãÊý±í´ïÊ½²¢ÒÔ'#'½áÎ²" << endl;
+    resultByFunc();
     system("pause");
+    return 0;
 }
