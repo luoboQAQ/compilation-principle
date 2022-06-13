@@ -13,6 +13,8 @@ struct word {
     word() : sign(""), code(0){};
     word(string s, int c) : sign(s), code(c){};
 };
+//单词表
+vector<word> symbol;
 
 //字符串变量
 struct sign {
@@ -23,8 +25,20 @@ struct sign {
 
     sign() : name(""), cat(""), type(""), value(0){};
     sign(string n) : name(n), cat(""), type(""), value(0){};
+    sign(string n, int v) : name(n), cat(""), type(""), value(v){};
     sign(string n, string c, string t, int v) : name(n), cat(c), type(t), value(v){};
 };
+//字符串变量表
+vector<sign> signtable;
+
+//四元式
+struct quad {
+    string op;
+    string arg1;
+    string arg2;
+    string result;
+};
+vector<quad> quadtable;
 
 /**
  * @brief 词法分析程序
@@ -95,10 +109,6 @@ private:
     }
 
 public:
-    //单词表
-    vector<word> symbol;
-    //字符串变量表
-    vector<sign> signtable;
     /**
      * @brief 把关键字表中的symbol和code输入到propertytable结构体中
      *
@@ -189,6 +199,104 @@ public:
 };
 // END
 
+class Parser {
+private:
+    //当前临时变量的下标
+    int index = 0;
+    //临时变量表
+    vector<int> signTableTemp;
+
+public:
+    int findstring(int x) {
+        int i;
+        for (i = 0; i < (int)symbol.size(); i++)
+            if (atoi(symbol[i].sign.c_str()) == x)
+                break;
+        return i;
+    }
+
+    // 查变量的符号表入口地址
+    int entry(string& p) {
+        int i;
+        for (i = 0; i < (int)signtable.size(); i++) {
+            if (signtable[i].name == p) {
+                return i;
+            }
+        }
+        if (p == "T") {
+            i = 1000 + index;
+            index++;
+        } else {
+            i = stoi(p.c_str()) + 10000;
+        }
+        return i;
+    }
+
+    int newtemp(char op, int E1_place, int E2_place) {
+        int temp, temp1, temp2;
+        string T = 'T' + to_string(index);
+        if (E1_place >= 10000)
+            temp1 = E1_place - 10000;
+        else if (E1_place >= 1000)
+            temp1 = signTableTemp[E1_place - 1000];
+        else
+            temp1 = signtable[E1_place].value;
+        if (E2_place >= 10000)
+            temp2 = E2_place - 10000;
+        else if (E2_place >= 1000)
+            temp2 = signTableTemp[E2_place - 1000];
+        else
+            temp2 = signtable[E2_place].value;
+        if (op == '+')
+            temp = temp1 + temp2;
+        else if (op == '*')
+            temp = temp1 * temp2;
+        else if (op == '-')
+            temp = temp1 - temp2;
+        else if (op == '/') {
+            if (temp2 != 0)
+                temp = temp1 / temp2;
+        }
+        signTableTemp.emplace_back(temp);
+        return 1000 + index;
+    }
+
+    // 产生四元式
+    void gen(string op, int arg1, int arg2, string result) {
+        quad q;
+        q.op = op;
+        if (arg1 >= 10000)
+            q.arg1 = symbol[findstring(arg1 - 10000)].sign;
+        else if (arg1 == -1)
+            q.arg1 = "-";
+        else if (arg1 >= 1000)
+            q.arg1 = "T" + to_string(arg1 - 1000);
+        else
+            q.arg1 = signtable[arg1].name;
+        if (arg2 >= 10000)
+            q.arg2 = symbol[findstring(arg2 - 10000)].sign;
+        else if (arg2 == -1)
+            q.arg2 = "-";
+        else if (arg2 >= 1000)
+            q.arg2 = "T" + to_string(arg2 - 1000);
+        else
+            q.arg2 = signtable[arg2].name;
+        if (result == "T") {
+            q.result = "T" + to_string(index);
+        } else {
+            q.result = result;
+        }
+        quadtable.emplace_back(q);
+        index++;
+        // NXQ = quad_i;
+    }
+
+    void gen(char op, int arg1, int arg2, string result) {
+        string op1(1, op);
+        gen(op1, arg1, arg2, result);
+    }
+};
+
 // LR语法分析程序
 class LRAnalysis {
 private:
@@ -208,8 +316,7 @@ private:
         {-1, 103, 103, 103, 103, -1, 103, 103, -1},
         {-1, 104, 104, 104, 104, -1, 104, 104, -1},
         {-1, 105, 105, 105, 105, -1, 105, 105, -1}};
-    //当前分析词法下标
-    int index;
+    Parser* parser;
 
     /**
      * @brief 获得LR分析表表头的下标
@@ -227,14 +334,31 @@ private:
     }
 
 public:
-    bool analyse(LexicalAnalysis& la) {
-        index = 0;
+    LRAnalysis() {
+        parser = new Parser();
+    }
+
+    ~LRAnalysis() {
+        delete parser;
+    }
+
+    /**
+     * @brief 对代码进行LR语法分析并生成四元式
+     *
+     * @return 是否分析成功
+     */
+    bool sentenceAnalysis() {
+        //当前分析词法下标
+        int index = 0;
+        int E1_place, E2_place;
         stack<int> s1, s2;
+        stack<int> s3;
         s1.emplace(0);
         //压入#
         s2.emplace(24);
+        s3.emplace('@');
         //读入的单词序号
-        int sym = la.symbol[index++].code;
+        int sym = symbol[index++].code;
         if (sym == 1 || sym == 2)
             sym = 'i';
         //是否分析成功
@@ -250,22 +374,35 @@ public:
                 //移进操作
                 s1.emplace(action);
                 s2.emplace(sym);
-                sym = la.symbol[index++].code;
+                if (sym == 'i')
+                    s3.emplace(parser->entry(symbol[index - 1].sign));
+                else
+                    s3.emplace('@');
+                sym = symbol[index++].code;
                 if (sym == 1 || sym == 2)
                     sym = 'i';
             } else if (action >= 100 && action < 200) {
+                char op = 0;
                 //规约操作
                 switch (action) {
                 //规约:E -> E + E
                 case 101:
+                    op = '+';
+                    break;
                 //规约:E -> E - E
                 case 102:
+                    op = '-';
+                    break;
                 //规约:E -> E * E
                 case 103:
+                    op = '*';
+                    break;
                 //规约:E -> E / E
                 case 104:
+                    op = '/';
+                    break;
                 //规约:E -> (E)
-                case 105:
+                case 105: {
                     s1.pop();
                     s1.pop();
                     s1.pop();
@@ -273,9 +410,15 @@ public:
                     s2.pop();
                     s2.pop();
                     s2.emplace('E');
+                    s3.pop();
+                    int temp = s3.top();
+                    s3.pop();
+                    s3.pop();
                     action = s1.top();
                     s1.emplace(LRTable[action][getLRIndex('E')]);
+                    s3.emplace(temp);
                     break;
+                }
                 //规约:E -> i
                 case 106:
                     s1.pop();
@@ -285,11 +428,34 @@ public:
                     s1.emplace(LRTable[action][getLRIndex('E')]);
                     break;
                 }
+                if (op) {
+                    s1.pop();
+                    s1.pop();
+                    s1.pop();
+                    s2.pop();
+                    s2.pop();
+                    s2.pop();
+                    s2.emplace('E');
+                    E2_place = s3.top();
+                    s3.pop();
+                    s3.pop();
+                    E1_place = s3.top();
+                    s3.pop();
+                    s3.emplace(parser->newtemp(op, E1_place, E2_place));
+                    parser->gen(op, E1_place, E2_place, "T");
+                    action = s1.top();
+                    s1.emplace(LRTable[action][getLRIndex('E')]);
+                }
             }
         }
         return true;
     }
 };
+
+void printQuad() {
+    for (int i = 0; i < (int)quadtable.size(); i++)
+        cout << '(' << quadtable[i].op << "," << quadtable[i].arg1 << "," << quadtable[i].arg2 << "," << quadtable[i].result << ')' << endl;
+}
 
 int main(int argc, char* argv[]) {
     string prefix;
@@ -319,8 +485,10 @@ int main(int argc, char* argv[]) {
     la.printSymbol();
     LRAnalysis lr;
     // 对程序进行语法分析
-    if (lr.analyse(la))
+    if (lr.sentenceAnalysis()) {
         cout << "语法分析成功" << endl;
+        printQuad();
+    }
     system("pause");
     return 0;
 }
