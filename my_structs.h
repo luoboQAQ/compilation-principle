@@ -31,4 +31,12 @@ struct property {
     string code;
 };
 
+//ËÄÔªÊ½
+struct quad {
+    string op;
+    string arg1;
+    string arg2;
+    string result;
+};
+
 #endif

@@ -9,6 +9,9 @@ set(CMAKE_CXX_STANDARD 11)
 set(DIR_SRCS compile.cpp compile.h
     lexical.cpp lexical.h
     my_structs.h
+    grammar.h grammar.cpp
+    operation.h operation.cpp
+    parser.h parser.cpp
 )
 
 # 指定生成目标

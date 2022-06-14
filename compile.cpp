@@ -2,6 +2,7 @@
 
 Complier::Complier() {
     lexical = new LexicalAnalysis(prefix + "keyword.txt", &symbol, &signtable);
+    grammar = new GrammarAnalysis(&symbol, &signtable);
 }
 
 Complier::~Complier() {
@@ -36,6 +37,8 @@ bool Complier::complie() {
         return false;
     lexical->test(code);
     printSymbol();
+    grammar->program();
+    grammar->printQuadTable();
     return true;
 }
 

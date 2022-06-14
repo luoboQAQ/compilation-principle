@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "grammar.h"
 #include "lexical.h"
 using namespace std;
 
@@ -13,6 +14,7 @@ private:
     //×Ö·û´®±äÁ¿±í
     vector<sign> signtable;
     class LexicalAnalysis *lexical;
+    class GrammarAnalysis *grammar;
     string code;
     const string prefix = "D:\\Code\\C++\\CompilationPrinciple\\";
 
