@@ -2,17 +2,22 @@
 
 #include <fstream>
 #include <iostream>
+#include <string>
 using namespace std;
 
 #define MAX 100
-int m = 0, sum = 0;  // sum用于计算运算符的个数
-                     // m用于标记输入表达式中字符的个数
-
+//计算运算符的个数
+int sum = 0;
+//标记输入表达式中字符的个数
+int m = 0;
+//临时变量的字符
 char JG = 'A';
-char str[MAX];  //用于存输入表达式
-int token = 0;  //左括号的标志
+//输入表达式
+string str;
+//左括号的标志
+int token = 0;
 
-/***********用于更改计算后数组中的值**************/
+//更改计算后数组中的值
 void change(int e) {
     int f = e + 2;
     char ch = str[f];
@@ -40,7 +45,7 @@ void chengchuchuli(int i, int m) {
             change(i - 1);
             str[i - 1] = str[i] = str[i + 1] = JG;
             sum--;
-            JG = (char)(int)JG++;
+            JG++;
         }
     }
 }
@@ -54,7 +59,7 @@ void jiajianchuli(int j, int m) {
             change(j - 1);
             str[j - 1] = str[j] = str[j + 1] = JG;
             sum--;
-            JG = (char)(int)JG++;
+            JG++;
         }
     }
 }
@@ -81,10 +86,10 @@ void scan(FILE *fin) {
             q = m - 1;
             chengchuchuli(p[c], q);  //从左括号处理到又括号
             jiajianchuli(p[c], q);
-            JG = (char)(int)JG--;
+            JG--;
             str[p[c]] = str[m - 1] = JG;
             c--;
-            JG = (char)(int)JG++;
+            JG++;
         }
     }
 }
@@ -98,7 +103,7 @@ void siyuanshi() {
             change(i - 1);
             str[i - 1] = str[i] = str[i + 1] = JG;
             sum--;
-            JG = (char)(int)JG++;
+            JG++;
         }
     }
 
@@ -109,14 +114,14 @@ void siyuanshi() {
             change(j - 1);
             str[j - 1] = str[j] = str[j + 1] = JG;
             sum--;
-            JG = (char)(int)JG++;
+            JG++;
         }
     }
 
     for (int k = 0; k <= m - 1; k++)  //处理赋值运算
     {
         if (str[k] == '=') {
-            JG = (char)(int)--JG;
+            JG--;
             cout << "(" << str[k] << "  " << str[k + 1] << "  "
                  << "  "
                  << " " << str[k - 1] << ")" << endl;
@@ -127,14 +132,15 @@ void siyuanshi() {
     }
 }
 
-/***************主函数*******************/
-main() {
-    char in[MAX];  //用于接收输入输出文件名
-    FILE *fin;     //用于指向输入输出文件的指针
-    cout << "INPUT:";
+int main() {
+    str.resize(100);
+    //接收输入输出文件名
+    string in;
+    FILE *fin;
+    cout << "请输入代码所在的文件名:";
     cin >> in;
     cout << endl;
-    if ((fin = fopen(in, "r")) == NULL)  //判断输入文件名是否正确
+    if ((fin = fopen(in.c_str(), "r")) == NULL)  //判断输入文件名是否正确
     {
         cout << endl
              << "Error!" << endl;
@@ -155,4 +161,5 @@ main() {
     //关闭文件
     fclose(fin);
     system("pause");
+    return 0;
 }
