@@ -12,6 +12,7 @@ set(DIR_SRCS compile.cpp compile.h
     grammar.h grammar.cpp
     operation.h operation.cpp
     parser.h parser.cpp
+    coder.h coder.cpp
 )
 
 # 指定生成目标

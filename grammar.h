@@ -12,7 +12,7 @@ private:
     class OperationAnalysis *operation;
     vector<word> *symbol;
     vector<sign> *signtable;
-    vector<quad> quadtable;
+    vector<quad> *quadtable;
     int symbol_index = 0;
     int temp_index = 0;
     int sym = 0;
@@ -22,12 +22,10 @@ private:
 public:
     GrammarAnalysis(){};
     ~GrammarAnalysis();
-    GrammarAnalysis(vector<word> *symbol, vector<sign> *signtable);
+    GrammarAnalysis(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable);
 
     bool program();
     bool analysis();
-
-    void printQuadTable();
 };
 
 #endif

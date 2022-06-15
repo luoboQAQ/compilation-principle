@@ -5,11 +5,12 @@ GrammarAnalysis::~GrammarAnalysis() {
     delete operation;
 }
 
-GrammarAnalysis::GrammarAnalysis(vector<word> *symbol, vector<sign> *signtable) {
-    this->parser = new Parser(symbol, signtable, &quadtable, &temp_index);
+GrammarAnalysis::GrammarAnalysis(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable) {
+    this->parser = new Parser(symbol, signtable, quadtable, &temp_index);
     this->operation = new OperationAnalysis(parser, symbol, &symbol_index, &sym, &Flag, &Temp);
     this->symbol = symbol;
     this->signtable = signtable;
+    this->quadtable = quadtable;
 }
 
 bool GrammarAnalysis::program() {
@@ -64,8 +65,3 @@ bool GrammarAnalysis::analysis() {
     }
     return true;
 }
-
-void GrammarAnalysis::printQuadTable() {
-    for (int i = 0; i < (int)quadtable.size(); i++)
-        cout << '(' << quadtable[i].op << "," << quadtable[i].arg1 << "," << quadtable[i].arg2 << "," << quadtable[i].result << ')' << endl;
-};
