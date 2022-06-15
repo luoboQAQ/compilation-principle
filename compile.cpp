@@ -37,7 +37,7 @@ bool Complier::complie() {
         return false;
     lexical->test(code);
     printSymbol();
-    grammar->program();
+    grammar->analysis();
     grammar->printQuadTable();
     return true;
 }

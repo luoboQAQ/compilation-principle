@@ -1,9 +1,10 @@
 #include "parser.h"
 
-Parser::Parser(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable) {
+Parser::Parser(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable, int *temp_index) {
     this->symbol = symbol;
     this->signtable = signtable;
     this->quadtable = quadtable;
+    this->temp_index = temp_index;
 }
 
 int Parser::findstring(int x) {
@@ -22,8 +23,8 @@ int Parser::entry(string &p) {
         }
     }
     if (p == "T") {
-        i = 1000 + index;
-        index++;
+        i = 1000 + *temp_index;
+        (*temp_index)++;
     } else {
         i = stoi(p.c_str()) + 10000;
     }
@@ -31,7 +32,7 @@ int Parser::entry(string &p) {
 };
 int Parser::newtemp(char op, int E1_place, int E2_place) {
     int temp, temp1, temp2;
-    string T = 'T' + to_string(index);
+    string T = 'T' + to_string(*temp_index);
     if (E1_place >= 10000)
         temp1 = E1_place - 10000;
     else if (E1_place >= 1000)
@@ -55,7 +56,7 @@ int Parser::newtemp(char op, int E1_place, int E2_place) {
             temp = temp1 / temp2;
     }
     signTableTemp.emplace_back(temp);
-    return 1000 + index;
+    return 1000 + *temp_index;
 }
 void Parser::gen(string op, int arg1, int arg2, string result) {
     quad q;
@@ -77,12 +78,12 @@ void Parser::gen(string op, int arg1, int arg2, string result) {
     else
         q.arg2 = signtable->at(arg2).name;
     if (result == "T") {
-        q.result = "T" + to_string(index);
+        q.result = "T" + to_string(*temp_index);
     } else {
         q.result = result;
     }
     quadtable->emplace_back(q);
-    index++;
+    (*temp_index)++;
     // NXQ = quad_i;
 }
 

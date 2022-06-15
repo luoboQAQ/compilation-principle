@@ -10,7 +10,7 @@ using namespace std;
 class Parser {
 private:
     //当前临时变量的下标
-    int index = 0;
+    int *temp_index;
     //临时变量表
     vector<int> signTableTemp;
     vector<word> *symbol;
@@ -20,7 +20,7 @@ private:
 public:
     Parser();
 
-    Parser(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable);
+    Parser(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable, int *temp_index);
 
     int findstring(int x);
 

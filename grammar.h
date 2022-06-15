@@ -13,6 +13,11 @@ private:
     vector<word> *symbol;
     vector<sign> *signtable;
     vector<quad> quadtable;
+    int symbol_index = 0;
+    int temp_index = 0;
+    int sym = 0;
+    int Flag = 0;
+    int Temp = 0;
 
 public:
     GrammarAnalysis(){};
@@ -20,6 +25,7 @@ public:
     GrammarAnalysis(vector<word> *symbol, vector<sign> *signtable);
 
     bool program();
+    bool analysis();
 
     void printQuadTable();
 };

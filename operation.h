@@ -27,6 +27,10 @@ private:
         {-1, 105, 105, 105, 105, -1, 105, 105, -1}};
     Parser* parser;
     vector<word>* symbol;
+    int* symbol_index;
+    int* sym;
+    int* Flag;
+    int* Temp;
 
     /**
      * @brief 获得LR分析表表头的下标
@@ -39,7 +43,7 @@ private:
 public:
     OperationAnalysis(){};
 
-    OperationAnalysis(Parser* parser, vector<word>* symbol);
+    OperationAnalysis(Parser* parser, vector<word>* symbol, int* symbol_index, int* sym, int* Flag, int* Temp);
 
     /**
      * @brief 对代码进行LR语法分析并生成四元式
