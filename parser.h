@@ -20,10 +20,11 @@ private:
     vector<word> *symbol;
     vector<sign> *signtable;
     vector<quad> *quadtable;
+    int *NXQ;
 
 public:
     Parser();
-    Parser(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable, int *temp_index);
+    Parser(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable, int *temp_index, int *NXQ);
 
     /**
      * @brief 查找单词在单词表中的下标
@@ -72,6 +73,10 @@ public:
      * @param result 结果的符号表入口地址
      */
     void gen(char op, int arg1, int arg2, string result);
+
+    void backPatch(int p, int t);
+
+    int merg(int p1, int p2);
 };
 
 #endif

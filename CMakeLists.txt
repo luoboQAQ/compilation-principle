@@ -13,6 +13,7 @@ set(DIR_SRCS compile.cpp compile.h
     operation.h operation.cpp
     parser.h parser.cpp
     coder.h coder.cpp
+    conditional.h conditional.cpp
 )
 
 # 指定生成目标

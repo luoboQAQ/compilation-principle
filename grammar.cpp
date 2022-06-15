@@ -6,8 +6,9 @@ GrammarAnalysis::~GrammarAnalysis() {
 }
 
 GrammarAnalysis::GrammarAnalysis(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable) {
-    this->parser = new Parser(symbol, signtable, quadtable, &temp_index);
+    this->parser = new Parser(symbol, signtable, quadtable, &temp_index, &NXQ);
     this->operation = new OperationAnalysis(parser, symbol, &symbol_index, &sym, &Flag, &Temp);
+    this->conditional = new ConditionalAnalyzer(parser, operation, symbol, signtable, &symbol_index, &temp_index, &sym, &NXQ, &E_TC, &E_FC);
     this->symbol = symbol;
     this->signtable = signtable;
     this->quadtable = quadtable;

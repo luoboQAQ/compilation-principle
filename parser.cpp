@@ -1,10 +1,11 @@
 #include "parser.h"
 
-Parser::Parser(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable, int *temp_index) {
+Parser::Parser(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable, int *temp_index, int *NXQ) {
     this->symbol = symbol;
     this->signtable = signtable;
     this->quadtable = quadtable;
     this->temp_index = temp_index;
+    this->NXQ = NXQ;
 }
 
 int Parser::findstring(int x) {
@@ -92,4 +93,31 @@ void Parser::gen(string op, int arg1, int arg2, string result) {
 void Parser::gen(char op, int arg1, int arg2, string result) {
     string op1(1, op);
     gen(op1, arg1, arg2, result);
+}
+
+void Parser::backPatch(int p, int t) {
+    int Q;
+    string q;
+    Q = p;
+    while (Q != 0) {
+        q == (*quadtable)[Q].result;
+        (*quadtable)[Q].result = to_string(t);
+        Q = atoi(q.c_str());
+    }
+}
+
+int Parser::merg(int p1, int p2) {
+    int p;
+    if (p1 > p2) {
+        return p1;
+    }
+    if (p2 == 0) {
+        return p1;
+    } else {
+        p = p2;
+        while ((*quadtable)[p].result == "0")
+            p = atoi((*quadtable)[p].result.c_str());
+        (*quadtable)[p].result = to_string(p1);
+        return p2;
+    }
 }
