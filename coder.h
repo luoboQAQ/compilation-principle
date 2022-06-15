@@ -9,16 +9,10 @@
 using namespace std;
 #include "my_structs.h"
 
+//汇编生成类
 class Coder {
 private:
     vector<quad> *quadtable;
-    struct L {
-        int i;
-        string li;
-        L(){};
-        L(int a, string i) : i(a), li(i){};
-    };
-    //    vector<L> LTable;
 
     //汇编语句
     struct Com {
@@ -37,8 +31,10 @@ public:
 
     Coder(vector<quad> *t) : quadtable(t){};
 
+    //将四元式转成汇编代码
     void quadtocode();
 
+    //打印汇编代码
     void printCode();
 };
 

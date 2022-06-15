@@ -6,9 +6,12 @@
 #include "parser.h"
 using namespace std;
 
+// 语法分析类
 class GrammarAnalysis {
 private:
+    //四元式分析类
     class Parser *parser;
+    //四则运算语法分析类
     class OperationAnalysis *operation;
     vector<word> *symbol;
     vector<sign> *signtable;
@@ -19,12 +22,14 @@ private:
     int Flag = 0;
     int Temp = 0;
 
+    // 语法分析
+    bool program();
+
 public:
     GrammarAnalysis(){};
     ~GrammarAnalysis();
     GrammarAnalysis(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable);
-
-    bool program();
+    //使用递归下降法分析语法
     bool analysis();
 };
 

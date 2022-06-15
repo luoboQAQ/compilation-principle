@@ -13,7 +13,7 @@ int Parser::findstring(int x) {
         if (atoi(symbol->at(i).sign.c_str()) == x)
             break;
     return i;
-};
+}
 
 int Parser::entry(string &p) {
     int i;
@@ -29,7 +29,8 @@ int Parser::entry(string &p) {
         i = stoi(p.c_str()) + 10000;
     }
     return i;
-};
+}
+
 int Parser::newtemp(char op, int E1_place, int E2_place) {
     int temp, temp1, temp2;
     string T = 'T' + to_string(*temp_index);
@@ -58,6 +59,7 @@ int Parser::newtemp(char op, int E1_place, int E2_place) {
     signTableTemp.emplace_back(temp);
     return 1000 + *temp_index;
 }
+
 void Parser::gen(string op, int arg1, int arg2, string result) {
     quad q;
     q.op = op;
