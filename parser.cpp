@@ -86,8 +86,7 @@ void Parser::gen(string op, int arg1, int arg2, string result) {
         q.result = result;
     }
     quadtable->emplace_back(q);
-    (*temp_index)++;
-    // NXQ = quad_i;
+    *NXQ = quadtable->size();
 }
 
 void Parser::gen(char op, int arg1, int arg2, string result) {

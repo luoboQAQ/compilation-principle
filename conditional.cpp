@@ -2,7 +2,7 @@
 
 ConditionalAnalyzer::ConditionalAnalyzer(Parser* parser, OperationAnalysis* operation,
                                          vector<word>* symbol, vector<sign>* signtable, int* symbol_index, int* temp_index,
-                                         int* sym, int* NXQ, int* E_TC, int* E_FC) {
+                                         int* sym, int* sym1, int* NXQ, int* E_TC, int* E_FC) {
     this->parser = parser;
     this->operation = operation;
     this->symbol = symbol;
@@ -10,6 +10,7 @@ ConditionalAnalyzer::ConditionalAnalyzer(Parser* parser, OperationAnalysis* oper
     this->symbol_index = symbol_index;
     this->temp_index = temp_index;
     this->sym = sym;
+    this->sym1 = sym1;
     this->NXQ = NXQ;
     this->E_TC = E_TC;
     this->E_FC = E_FC;
@@ -35,13 +36,13 @@ int ConditionalAnalyzer::getLRIndex(int a) {
 }
 
 void ConditionalAnalyzer::operAnalyze(string& tempstring, int& NXQ_temp) {
-    *sym = (*symbol)[(*symbol_index)++].code;
-    if (*sym == 1 || *sym == 2) {
+    *sym1 = (*symbol)[(*symbol_index)++].code;
+    if (*sym1 == 1 || *sym1 == 2) {
         tempstring = (*symbol)[(*symbol_index) - 1].sign;
-        *sym = (*symbol)[(*symbol_index)].code;
-        if (*sym >= 3 && *sym <= 6 || *sym == 16) {
+        *sym1 = (*symbol)[(*symbol_index)].code;
+        if (*sym1 >= 3 && *sym1 <= 6 || *sym1 == 16) {
             NXQ_temp = *NXQ;
-            if (*sym == 16) {
+            if (*sym1 == 16) {
                 (*symbol_index)++;
                 if (operation->sentenceAnalysis()) {
                     parser->gen("=", 1000 + *temp_index - 1, -1, (*signtable)[parser->entry(tempstring)].name);
@@ -56,7 +57,8 @@ void ConditionalAnalyzer::operAnalyze(string& tempstring, int& NXQ_temp) {
             }
         }
         *sym = 'i';
-    }
+    } else
+        *sym = *sym1;
 }
 
 bool ConditionalAnalyzer::analyze() {
@@ -64,6 +66,9 @@ bool ConditionalAnalyzer::analyze() {
     string tempstring;
     int NXQ_temp = 0;
     int EA_FC, EO_TC;
+    int E1_place, E2_place;
+    int op;
+    int temp;
     s1.emplace(0);
     s2.emplace(24);
     s3.emplace('@');
@@ -85,9 +90,6 @@ bool ConditionalAnalyzer::analyze() {
                 s3.emplace('@');
             operAnalyze(tempstring, NXQ_temp);
         } else if (action >= 100 && action <= 200) {
-            int E1_place, E2_place;
-            int op;
-            int temp;
             switch (action) {
             case 101:
                 s1.pop();
@@ -172,7 +174,7 @@ bool ConditionalAnalyzer::analyze() {
                 s3.pop();
                 s2.emplace('A');
                 action = s1.top();
-                s1.emplace(LRTable[action][getLRIndex('E')]);
+                s1.emplace(LRTable[action][getLRIndex('A')]);
                 if (NXQ_temp > 1) {
                     parser->backPatch(*E_TC, NXQ_temp);
                     NXQ_temp = 0;

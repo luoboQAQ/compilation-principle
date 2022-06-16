@@ -1,11 +1,12 @@
 #include "operation.h"
 
 OperationAnalysis::OperationAnalysis(Parser* parser, vector<word>* symbol,
-                                     int* symbol_index, int* sym, int* Flag, int* Temp) {
+                                     int* symbol_index, int* sym, int* sym1, int* Flag, int* Temp) {
     this->parser = parser;
     this->symbol = symbol;
     this->symbol_index = symbol_index;
     this->sym = sym;
+    this->sym1 = sym1;
     this->Flag = Flag;
     this->Temp = Temp;
 }
@@ -30,9 +31,11 @@ bool OperationAnalysis::sentenceAnalysis() {
     s2.emplace(24);
     s3.emplace('@');
     //读入的单词序号
-    *sym = (*symbol)[(*symbol_index)++].code;
-    if (*sym == 1 || *sym == 2)
+    *sym1 = (*symbol)[(*symbol_index)++].code;
+    if (*sym1 == 1 || *sym1 == 2)
         *sym = 'i';
+    else
+        *sym = *sym1;
     //是否分析成功
     bool acc = false;
     while (!acc) {
@@ -50,9 +53,11 @@ bool OperationAnalysis::sentenceAnalysis() {
                 s3.emplace(parser->entry(symbol->at(*symbol_index - 1).sign));
             else
                 s3.emplace('@');
-            *sym = (*symbol)[(*symbol_index)++].code;
-            if (*sym == 1 || *sym == 2)
+            *sym1 = (*symbol)[(*symbol_index)++].code;
+            if (*sym1 == 1 || *sym1 == 2)
                 *sym = 'i';
+            else
+                *sym = *sym1;
         } else if (action >= 100 && action < 200) {
             char op = 0;
             //规约操作

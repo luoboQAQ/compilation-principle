@@ -21,11 +21,14 @@ private:
     int symbol_index = 0;
     int temp_index = 0;
     int sym = 0;
+    int sym1 = 0;
     int Flag = 0;
     int Temp = 0;
     int NXQ = 1;
     int E_TC = 0;
     int E_FC = 0;
+    int Schain = 0;
+    bool ifFlag = false, whileFlag = false, doFlag = false;
 
     // ”Ô∑®∑÷Œˆ
     bool program();

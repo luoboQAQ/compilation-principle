@@ -35,7 +35,7 @@ private:
     vector<sign>* signtable;
     int* symbol_index;
     int* temp_index;
-    int* sym;
+    int *sym, *sym1;
     int* NXQ;
     int *E_TC, *E_FC;
     int bracket = 0;
@@ -48,7 +48,7 @@ public:
     ConditionalAnalyzer(){};
     ConditionalAnalyzer(Parser* parser, OperationAnalysis* operation,
                         vector<word>* symbol, vector<sign>* signtable, int* symbol_index, int* temp_index,
-                        int* sym, int* NXQ, int* E_TC, int* E_FC);
+                        int* sym, int* sym1, int* NXQ, int* E_TC, int* E_FC);
     bool analyze();
 };
 

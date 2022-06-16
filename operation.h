@@ -28,7 +28,7 @@ private:
     Parser* parser;
     vector<word>* symbol;
     int* symbol_index;
-    int* sym;
+    int *sym, *sym1;
     int* Flag;
     int* Temp;
 
@@ -43,7 +43,7 @@ private:
 public:
     OperationAnalysis(){};
 
-    OperationAnalysis(Parser* parser, vector<word>* symbol, int* symbol_index, int* sym, int* Flag, int* Temp);
+    OperationAnalysis(Parser* parser, vector<word>* symbol, int* symbol_index, int* sym, int* sym1, int* Flag, int* Temp);
 
     /**
      * @brief 对代码进行LR语法分析并生成四元式
