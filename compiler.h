@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "combuilder.h"
 #include "grammar.h"
 #include "lexical.h"
 #include "my_structs.h"
@@ -16,11 +17,13 @@ com comTable[300];
 int propertyTableSize = 0, signTableSize = 0, symbolTableSize = 0;
 int Flag, tempIndex = 1, quadIndex = 1, NXQ = 1, sym1, symbolIndex = 0, Temp, bracket, E_TC, E_FC, Schain;
 bool ifFlag, whileFlag, doFlag;
+int comIndex;
 
 class Compiler {
 private:
     class LexicalAnalysis lexical;
     class GrammarAnalysis grammar;
+    class ComBuilder comBuilder;
 
 public:
     void init(string filename);
@@ -30,6 +33,8 @@ public:
     void printSymbol();
 
     void printQuad();
+
+    void printCom();
 };
 
 #endif

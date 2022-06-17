@@ -6,7 +6,11 @@ void Compiler::init(string filename) {
 
 void Compiler::compile(string& code) {
     lexical.analyse(code);
+    // printSymbol();
     grammar.analyse();
+    printQuad();
+    comBuilder.build();
+    printCom();
 }
 
 void Compiler::printSymbol() {
@@ -21,6 +25,20 @@ void Compiler::printQuad() {
     for (i = 1; i < quadIndex; i++) {
         cout << '(' << i << "): ";
         cout << '(' << quadTable[i].op << "," << quadTable[i].arg1 << "," << quadTable[i].arg2 << "," << quadTable[i].result << ')' << endl;
+    }
+}
+
+void Compiler::printCom() {
+    cout << "汇编代码如下：" << endl;
+    int i;
+    for (i = 0; i < comIndex; i++) {
+        if (!comTable[i].lable.empty())
+            cout << comTable[i].lable << ": " << comTable[i].op << " " << comTable[i].arg1;
+        else
+            cout << "    " << comTable[i].op << " " << comTable[i].arg1;
+        if (!comTable[i].arg2.empty())
+            cout << "," << comTable[i].arg2;
+        cout << endl;
     }
 }
 
@@ -45,8 +63,6 @@ int main(int argc, char* argv[]) {
     cout << "C语言代码如下: " << endl;
     cout << code << endl;
     compiler.compile(code);
-    // compiler.printSymbol();
-    compiler.printQuad();
     system("pause");
     return 0;
 }
