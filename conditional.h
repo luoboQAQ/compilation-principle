@@ -9,8 +9,10 @@
 #include "parser.h"
 using namespace std;
 
+//条件语句语法分析类
 class ConditionalAnalyzer {
 private:
+    // LR分析表
     const int LRTable[16][11] =
         {{1, -1, 4, -1, 5, -1, -1, -1, 13, 7, 8},
          {-1, 2, -1, 101, -1, 101, 101, 101, -1, -1, -1},
@@ -29,7 +31,9 @@ private:
          {-1, -1, -1, 106, -1, 106, 106, 106, -1, -1, -1},
          {-1, -1, -1, 108, -1, 9, 108, 108, -1, -1, -1}};
 
+    // 四元式工具类
     class Parser *parser;
+    //四则运算语法分析类
     class OperationAnalysis *operation;
 
     /**
@@ -43,6 +47,7 @@ private:
 public:
     ConditionalAnalyzer(Parser *p, OperationAnalysis *o) : parser(p), operation(o){};
 
+    //对条件语句进行语法分析
     bool analyse();
 };
 #endif

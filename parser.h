@@ -4,6 +4,7 @@
 #include "my_structs.h"
 using namespace std;
 
+//四元式工具类
 class Parser {
 public:
     /**

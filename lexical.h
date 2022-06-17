@@ -7,6 +7,7 @@
 #include "my_structs.h"
 using namespace std;
 
+//´Ê·¨·ÖÎöÀà
 class LexicalAnalysis {
 private:
     /**

@@ -8,6 +8,7 @@
 #include "parser.h"
 using namespace std;
 
+//四则运算语法分析类
 class OperationAnalysis {
 private:
     // LR分析表
@@ -26,6 +27,7 @@ private:
         {-1, 103, 103, 103, 103, -1, 103, 103, -1},
         {-1, 104, 104, 104, 104, -1, 104, 104, -1},
         {-1, 105, 105, 105, 105, -1, 105, 105, -1}};
+    // 四元式工具类
     class Parser *parser;
 
     /**
