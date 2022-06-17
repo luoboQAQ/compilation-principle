@@ -1,17 +1,19 @@
 #include "lexical.h"
 
-bool LexicalAnalysis::findcreate(string& p, bool type) {
+bool LexicalAnalysis::findcreate(string &p, bool type) {
     int i;
-    for (i = 0; i < (int)signtable->size(); i++) {
-        if (signtable->at(i).name == p) {
-            symbol->emplace_back(word(p, 1));
-            return true;
+    for (i = 0; i < signTableSize; i++) {
+        if (signTable[i].name == p) {
+            symbolTable[symbolTableSize].sign = p;
+            symbolTable[symbolTableSize++].code = 1;
+            return 0;
         }
     }
-    // 字符串常量表中没有单词p,就把p存储到字符串常量表和单词表中
-    if (i == (int)signtable->size() && type) {
-        symbol->emplace_back(word(p, 1));
-        signtable->emplace_back(sign(p));
+    //字符串常量表中没有单词p,就把p存储到字符串常量表和单词表中
+    if (i == signTableSize && type) {
+        symbolTable[symbolTableSize].sign = p;
+        symbolTable[symbolTableSize++].code = 1;
+        signTable[signTableSize++].name = p;
     }
     if (!type) {
         cout << p << "未定义!" << endl;
@@ -19,46 +21,49 @@ bool LexicalAnalysis::findcreate(string& p, bool type) {
     }
     return true;
 }
-
-void LexicalAnalysis::find(string& p, bool type) {
+void LexicalAnalysis::addSymbol(string &p, bool type) {
     int i;
-    //整数
-    if (p[0] >= '0' && p[0] <= '9') {
-        symbol->emplace_back(word(p, 2));
+    if (isdigit(p[0])) {
+        symbolTable[symbolTableSize].sign = p;
+        symbolTable[symbolTableSize++].code = 2;
     } else {
-        for (i = 0; i < (int)propertytable.size(); i++) {
-            if (propertytable[i].symbol == p) {
-                symbol->emplace_back(word(p, atoi(propertytable[i].code.c_str())));
+        for (i = 0; i < propertyTableSize; i++) {
+            if (propertyTable[i].symbol == p) {
+                symbolTable[symbolTableSize].sign = p;
+                symbolTable[symbolTableSize++].code = atoi(propertyTable[i].code.c_str());
                 break;
             }
         }
-        if (i == (int)propertytable.size()) {
-            //如果符合就是字符串常量
-            if (isalpha(p[0]))
+        if (i == propertyTableSize) {
+            if (isalpha(p[0])) {
+                //如果符合就是字符串常量
                 findcreate(p, type);
-            else if (p[0] >= 32)
-                symbol->emplace_back(word(p, p[0]));
+            } else if (p[0] >= 32) {
+                symbolTable[symbolTableSize].sign = p;
+                symbolTable[symbolTableSize++].code = 0;
+            }
         }
     }
 }
 
-void LexicalAnalysis::loadProperty(string local) {
-    ifstream fin(local);
+void LexicalAnalysis::loadProperty(string fileName) {
+    int i = 0;
+    ifstream fin(fileName);
     if (!fin.is_open()) {
         cout << "无法找到关键字表" << endl;
         return;
     }
-    property p;
     while (!fin.eof()) {
-        fin >> p.symbol >> p.code;
-        propertytable.emplace_back(p);
+        fin >> propertyTable[i].symbol >> propertyTable[i].code;
+        i++;
+        propertyTableSize++;
     }
-    // 关闭文件
     fin.close();
 }
 
-void LexicalAnalysis::test(string& code) {
+void LexicalAnalysis::analyse(string &code) {
     bool type = true;
+    int k;
     string word;
     string::iterator p = code.begin();
     while (p < code.end()) {
@@ -74,7 +79,7 @@ void LexicalAnalysis::test(string& code) {
             if (word == "int" || word == "float" || word == "char")
                 // 为1代表int float char 类型的字符串变量
                 type = true;
-            find(word, type);
+            addSymbol(word, type);
         } else if (*p >= '0' && *p <= '9') {
             //判断单词是否为整数
             word.clear();
@@ -84,7 +89,7 @@ void LexicalAnalysis::test(string& code) {
                 word += *p;
                 p++;
             }
-            find(word, type);
+            addSymbol(word, type);
         } else if (*p == '<' || *p == '>' || *p == '=' || *p == '!' || *p == '&' || *p == '|') {
             word.clear();
             word += *p;
@@ -99,7 +104,7 @@ void LexicalAnalysis::test(string& code) {
                 word += *p;
                 p++;
             }
-            find(word, type);
+            addSymbol(word, type);
         } else if (*p == ' ') {
             p++;
         } else {
@@ -109,18 +114,7 @@ void LexicalAnalysis::test(string& code) {
                 type = false;
             }
             p++;
-            find(word, type);
+            addSymbol(word, type);
         }
     }
-}
-
-LexicalAnalysis::LexicalAnalysis(vector<word>* sy, vector<sign>* si) {
-    symbol = sy;
-    signtable = si;
-}
-
-LexicalAnalysis::LexicalAnalysis(string local, vector<word>* sy, vector<sign>* si) {
-    loadProperty(local);
-    symbol = sy;
-    signtable = si;
 }

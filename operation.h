@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stack>
 
+#include "my_structs.h"
 #include "parser.h"
 using namespace std;
 
@@ -25,12 +26,7 @@ private:
         {-1, 103, 103, 103, 103, -1, 103, 103, -1},
         {-1, 104, 104, 104, 104, -1, 104, 104, -1},
         {-1, 105, 105, 105, 105, -1, 105, 105, -1}};
-    Parser* parser;
-    vector<word>* symbol;
-    int* symbol_index;
-    int* sym;
-    int* Flag;
-    int* Temp;
+    class Parser *parser;
 
     /**
      * @brief 获得LR分析表表头的下标
@@ -41,16 +37,13 @@ private:
     int getLRIndex(int a);
 
 public:
-    OperationAnalysis(){};
-
-    OperationAnalysis(Parser* parser, vector<word>* symbol, int* symbol_index, int* sym, int* Flag, int* Temp);
+    OperationAnalysis(Parser *p) : parser(p){};
 
     /**
      * @brief 对代码进行LR语法分析并生成四元式
      *
      * @return 是否分析成功
      */
-    bool sentenceAnalysis();
+    bool analyse();
 };
-
 #endif

@@ -6,13 +6,13 @@ set(CMAKE_CXX_STANDARD 11)
 
 # 查找当前目录下的所有源文件,并将名称保存到 DIR_SRCS 变量
 # aux_source_directory(. DIR_SRCS)
-set(DIR_SRCS compile.cpp compile.h
-    lexical.cpp lexical.h
+set(DIR_SRCS compiler.h compiler.cpp
     my_structs.h
+    lexical.h lexical.cpp
     grammar.h grammar.cpp
-    operation.h operation.cpp
     parser.h parser.cpp
-    coder.h coder.cpp
+    operation.h operation.cpp
+    conditional.h conditional.cpp
 )
 
 # 指定生成目标

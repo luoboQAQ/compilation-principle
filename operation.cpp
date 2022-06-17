@@ -1,105 +1,107 @@
 #include "operation.h"
 
-OperationAnalysis::OperationAnalysis(Parser* parser, vector<word>* symbol,
-                                     int* symbol_index, int* sym, int* Flag, int* Temp) {
-    this->parser = parser;
-    this->symbol = symbol;
-    this->symbol_index = symbol_index;
-    this->sym = sym;
-    this->Flag = Flag;
-    this->Temp = Temp;
-}
-
 int OperationAnalysis::getLRIndex(int a) {
-    int PAT[9] = {'i', 3, 4, 5, 6, 17, 18, '#', 'E'};
-    for (int i = 0; i < 9; i++) {
-        if (a == PAT[i])
-            return i;
+    int i;
+    int PAT[] = {'i', 3, 4, 5, 6, 17, 18, '#', 'E'};
+    i = 0;
+    while (PAT[i] != a && i <= 8) {
+        i++;
     }
-    return 7;
+    if (i == 9) {
+        i = 7;
+    }
+    return i;
 }
 
-bool OperationAnalysis::sentenceAnalysis() {
-    //当前分析词法下标
-    int E1_place, E2_place;
-    stack<int> s1, s2;
-    stack<int> s3;
-    *Flag = 0;
+bool OperationAnalysis::analyse() {
+    int sym, acc, t, j, E1_place, E2_place, x, l;
+    stack<int> s1, s2, s3;
     s1.emplace(0);
     //压入#
     s2.emplace(24);
     s3.emplace('@');
-    //读入的单词序号
-    *sym = (*symbol)[(*symbol_index)++].code;
-    if (*sym == 1 || *sym == 2)
-        *sym = 'i';
-    //是否分析成功
-    bool acc = false;
+    Flag = 0;
+    sym1 = symbolTable[symbolIndex++].code;
+    if (sym1 == 1 || sym1 == 2) {
+        sym = 'i';
+    } else {
+        sym = sym1;
+    }
+    acc = false;
     while (!acc) {
-        int action = LRTable[s1.top()][getLRIndex(*sym)];
-        if (action == -1) {
-            cout << "错误：语法分析失败" << endl;
+        l = s1.top();
+        j = getLRIndex(sym);
+        t = LRTable[l][j];
+        if (t == -1) {
+            cout << "错误：四则运算语法错误" << endl;
             return false;
-        } else if (action == -2)
+        }
+        if (t == -2) {
             acc = true;
-        else if (action >= 0 && action < 100) {
-            //移进操作
-            s1.emplace(action);
-            s2.emplace(*sym);
-            if (*sym == 'i')
-                s3.emplace(parser->entry(symbol->at(*symbol_index - 1).sign));
-            else
+        }
+        if (t >= 0 && t < 100) {
+            s1.emplace(t);
+            s2.emplace(sym);
+            if (sym == 'i') {
+                s3.emplace(parser->entry(symbolTable[symbolIndex - 1].sign));
+            } else {
                 s3.emplace('@');
-            *sym = (*symbol)[(*symbol_index)++].code;
-            if (*sym == 1 || *sym == 2)
-                *sym = 'i';
-        } else if (action >= 100 && action < 200) {
+            }
+            sym1 = symbolTable[symbolIndex++].code;
+            if (sym1 == 1 || sym1 == 2) {
+                sym = 'i';
+            } else {
+                sym = sym1;
+            }
+        }
+        if (t >= 100 && t <= 200) {
             char op = 0;
-            //规约操作
-            switch (action) {
-            //规约:E -> E + E
+            switch (t) {
             case 101:
                 op = '+';
                 break;
-            //规约:E -> E - E
+
             case 102:
                 op = '-';
                 break;
-            //规约:E -> E * E
+
             case 103:
                 op = '*';
                 break;
-            //规约:E -> E / E
+
             case 104:
                 op = '/';
                 break;
-            //规约:E -> (E)
-            case 105: {
+
+            case 105:
                 s1.pop();
                 s1.pop();
                 s1.pop();
                 s2.pop();
                 s2.pop();
                 s2.pop();
+                s3.pop();
+                Temp = s3.top();
+                s3.pop();
+                s3.pop();
+                t = s1.top();
                 s2.emplace('E');
-                s3.pop();
-                int temp = s3.top();
-                s3.pop();
-                s3.pop();
-                action = s1.top();
-                s1.emplace(LRTable[action][getLRIndex('E')]);
-                s3.emplace(temp);
+                j = getLRIndex('E');
+                x = LRTable[t][j];
+                s1.emplace(x);
+                s3.emplace(Temp);
                 break;
-            }
-            //规约:E -> i
+
             case 106:
                 s1.pop();
                 s2.pop();
                 s2.emplace('E');
-                action = s1.top();
-                s1.emplace(LRTable[action][getLRIndex('E')]);
-                (*Flag)++;
-                break;
+                Temp = s3.top();
+                t = s1.top();
+                j = getLRIndex('E');
+                x = LRTable[t][j];
+                s1.emplace(x);
+                Flag++;
             }
             if (op) {
                 s1.pop();
@@ -108,17 +110,21 @@ bool OperationAnalysis::sentenceAnalysis() {
                 s2.pop();
                 s2.pop();
                 s2.pop();
-                s2.emplace('E');
                 E2_place = s3.top();
                 s3.pop();
                 s3.pop();
                 E1_place = s3.top();
+                Temp = parser->newtemp(op, E1_place, E2_place);
                 s3.pop();
-                *Temp = parser->newtemp(op, E1_place, E2_place);
-                s3.emplace(*Temp);
-                parser->gen(op, E1_place, E2_place, "T");
-                action = s1.top();
-                s1.emplace(LRTable[action][getLRIndex('E')]);
+                t = s1.top();
+                s2.emplace('E');
+                j = getLRIndex('E');
+                x = LRTable[t][j];
+                s1.emplace(x);
+                string op1(1, op);
+                parser->gen(op1, E1_place, E2_place, "T");
+                tempIndex++;
+                s3.emplace(Temp);
             }
         }
     }

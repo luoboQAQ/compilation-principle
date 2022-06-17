@@ -1,30 +1,11 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <string>
-#include <vector>
-
 #include "my_structs.h"
 using namespace std;
 
-/**
- * @brief 四元式分析类
- *
- */
 class Parser {
-private:
-    //当前临时变量的下标
-    int *temp_index;
-    //临时变量表
-    vector<int> signTableTemp;
-    vector<word> *symbol;
-    vector<sign> *signtable;
-    vector<quad> *quadtable;
-
 public:
-    Parser();
-    Parser(vector<word> *symbol, vector<sign> *signtable, vector<quad> *quadtable, int *temp_index);
-
     /**
      * @brief 查找单词在单词表中的下标
      *
@@ -64,14 +45,21 @@ public:
     void gen(string op, int arg1, int arg2, string result);
 
     /**
-     * @brief 产生四元式并填入四元式表
+     * @brief 回填过程
      *
-     * @param op 运算符
-     * @param arg1 第一个操作数的符号表入口地址
-     * @param arg2 第二个操作数的符号表入口地址
-     * @param result 结果的符号表入口地址
+     * @param p 开始回填的链首
+     * @param t 回填的四元式下标
      */
-    void gen(char op, int arg1, int arg2, string result);
+    void Backpatch(int p, int t);
+
+    /**
+     * @brief 并链
+     *
+     * @param p1 第一条链首
+     * @param p2 第二条链首
+     * @return int 合并完成后的链首
+     */
+    int Merg(int p1, int p2);
 };
 
 #endif
