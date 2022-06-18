@@ -44,7 +44,7 @@ void Compiler::printCom() {
 
 int main(int argc, char* argv[]) {
     string prefix;
-    prefix = "D:\\Code\\C++\\CP\\code\\";
+    prefix = "D:\\Code\\C++\\CompilationPrinciple\\code\\";
     class Compiler compiler;
     compiler.init(prefix + "keyword.txt");
     string file;
