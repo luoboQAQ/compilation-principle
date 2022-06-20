@@ -29,17 +29,7 @@ void Compiler::printQuad() {
 }
 
 void Compiler::printCom() {
-    cout << "»ã±à´úÂëÈçÏÂ£º" << endl;
-    int i;
-    for (i = 0; i < comIndex; i++) {
-        if (!comTable[i].lable.empty())
-            cout << comTable[i].lable << ": " << comTable[i].op << " " << comTable[i].arg1;
-        else
-            cout << "    " << comTable[i].op << " " << comTable[i].arg1;
-        if (!comTable[i].arg2.empty())
-            cout << "," << comTable[i].arg2;
-        cout << endl;
-    }
+    comBuilder.printCom();
 }
 
 int main(int argc, char* argv[]) {

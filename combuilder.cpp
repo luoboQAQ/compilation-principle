@@ -98,62 +98,66 @@ void ComBuilder::build() {
             comIndex++;
         } else if (quadTable[i].op == "=") {
             comTable[comIndex].op = "MOV";
-            comTable[comIndex].arg1 = "AL";
+            comTable[comIndex].arg1 = "AX";
             comTable[comIndex].arg2 = quadTable[i].arg1;
             comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "MOV";
             comTable[comIndex].arg1 = quadTable[i].result;
-            comTable[comIndex].arg2 = "AL";
+            comTable[comIndex].arg2 = "AX";
             comIndex++;
         } else if (quadTable[i].op == "+") {
             comTable[comIndex].op = "MOV";
-            comTable[comIndex].arg1 = "AL";
+            comTable[comIndex].arg1 = "AX";
             comTable[comIndex].arg2 = quadTable[i].arg1;
             comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "MOV";
-            comTable[comIndex].arg1 = "BL";
+            comTable[comIndex].arg1 = "BX";
             comTable[comIndex].arg2 = quadTable[i].arg2;
             comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "ADD";
-            comTable[comIndex].arg1 = "BL";
-            comTable[comIndex].arg2 = "AL";
+            comTable[comIndex].arg1 = "BX";
+            comTable[comIndex].arg2 = "AX";
             comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "MOV";
             comTable[comIndex].arg1 = quadTable[i].result;
-            comTable[comIndex].arg2 = "BL";
+            comTable[comIndex].arg2 = "BX";
             comIndex++;
         } else if (quadTable[i].op == "-") {
             comTable[comIndex].op = "MOV";
-            comTable[comIndex].arg1 = "AL";
+            comTable[comIndex].arg1 = "BX";
             comTable[comIndex].arg2 = quadTable[i].arg1;
             comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "MOV";
-            comTable[comIndex].arg1 = "BL";
+            comTable[comIndex].arg1 = "AX";
             comTable[comIndex].arg2 = quadTable[i].arg2;
             comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "SUB";
-            comTable[comIndex].arg1 = "BL";
-            comTable[comIndex].arg2 = "AL";
+            comTable[comIndex].arg1 = "BX";
+            comTable[comIndex].arg2 = "AX";
             comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "MOV";
             comTable[comIndex].arg1 = quadTable[i].result;
-            comTable[comIndex].arg2 = "BL";
+            comTable[comIndex].arg2 = "BX";
             comIndex++;
         } else if (quadTable[i].op == "*") {
             comTable[comIndex].op = "MOV";
-            comTable[comIndex].arg1 = "AL";
+            comTable[comIndex].arg1 = "AX";
             comTable[comIndex].arg2 = quadTable[i].arg1;
+            comIndex++;
+            comTable[comIndex].op = "MOV";
+            comTable[comIndex].arg1 = "DI";
+            comTable[comIndex].arg2 = quadTable[i].arg2;
             comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "MUL";
-            comTable[comIndex].arg1 = quadTable[i].arg2;
+            comTable[comIndex].arg1 = "DI";
             comTable[comIndex].arg2 = "";
             comIndex++;
             comTable[comIndex].lable = "";
@@ -166,16 +170,72 @@ void ComBuilder::build() {
             comTable[comIndex].arg1 = "AX";
             comTable[comIndex].arg2 = quadTable[i].arg1;
             comIndex++;
+            comTable[comIndex].op = "MOV";
+            comTable[comIndex].arg1 = "DI";
+            comTable[comIndex].arg2 = quadTable[i].arg2;
+            comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "DIV";
-            comTable[comIndex].arg1 = quadTable[i].arg2;
+            comTable[comIndex].arg1 = "DI";
             comTable[comIndex].arg2 = "";
             comIndex++;
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "MOV";
             comTable[comIndex].arg1 = quadTable[i].result;
-            comTable[comIndex].arg2 = "AL";
+            comTable[comIndex].arg2 = "AX";
             comIndex++;
         }
     }
+    comTable[comIndex].lable = lTable.size() ? "L" + to_string(lTable.size()) : "";
+    comTable[comIndex].op = "MOV";
+    comTable[comIndex].arg1 = "AH";
+    comTable[comIndex].arg2 = "4CH";
+    comIndex++;
+}
+
+void ComBuilder::printVariables() {
+    cout << "DATAS SEGMENT" << endl;
+    for (int i = 0; i < signTableSize; i++) {
+        cout << "    " << signTable[i].name << " DW " << signTable[i].value << endl;
+    }
+    for (int i = 1; i <= tempIndex; i++) {
+        cout << "    " << ("T" + to_string(i)) << " DW " << '0' << endl;
+    }
+    cout << "DATAS ENDS" << endl;
+    cout << endl;
+}
+
+void ComBuilder::printStacks() {
+    cout << "STACKS SEGMENT" << endl;
+    cout << endl;
+    cout << "STACKS ENDS" << endl;
+    cout << endl;
+}
+
+void ComBuilder::printCode() {
+    cout << "CODES SEGMENT" << endl
+         << "    ASSUME CS:CODES,DS:DATAS,SS:STACKS" << endl
+         << "START:" << endl
+         << "    MOV AX,DATAS" << endl
+         << "    MOV DS,AX" << endl
+         << "    MOV DX,0" << endl;
+    for (int i = 0; i < comIndex; i++) {
+        if (!comTable[i].lable.empty())
+            cout << comTable[i].lable << ": " << comTable[i].op << " " << comTable[i].arg1;
+        else
+            cout << "    " << comTable[i].op << " " << comTable[i].arg1;
+        if (!comTable[i].arg2.empty())
+            cout << "," << comTable[i].arg2;
+        cout << endl;
+    }
+    cout << "    INT 21H" << endl
+         << "    CODES ENDS " << endl
+         << "END START" << endl;
+}
+
+void ComBuilder::printCom() {
+    cout << "»ã±à´úÂëÈçÏÂ£º" << endl;
+    printVariables();
+    printStacks();
+    printCode();
 }
