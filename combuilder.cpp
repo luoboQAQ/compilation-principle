@@ -198,7 +198,7 @@ void ComBuilder::printVariables() {
     for (int i = 0; i < signTableSize; i++) {
         cout << "    " << signTable[i].name << " DW " << signTable[i].value << endl;
     }
-    for (int i = 1; i <= tempIndex; i++) {
+    for (int i = 1; i < tempIndex; i++) {
         cout << "    " << ("T" + to_string(i)) << " DW " << '0' << endl;
     }
     cout << "DATAS ENDS" << endl;

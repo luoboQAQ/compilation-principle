@@ -14,7 +14,6 @@ GrammarAnalysis::~GrammarAnalysis() {
 
 void GrammarAnalysis::program() {
     int temp, q, ffc, Tchain;
-    char s_q[10];
     string tempstring;
     sym1 = symbolTable[symbolIndex++].code;
     if (sym1 >= 27 && sym1 <= 29) {
@@ -94,15 +93,7 @@ void GrammarAnalysis::program() {
                 ffc = E_FC;
                 program();
                 parser->Backpatch(Schain, NXQ);
-                if (q < 10) {
-                    s_q[0] = q + '0';
-                    s_q[1] = '\0';
-                } else {
-                    s_q[0] = q / 10 + '0';
-                    s_q[1] = q % 10 + '0';
-                    s_q[2] = '\0';
-                }
-                parser->gen("j", -1, -1, s_q);
+                parser->gen("j", -1, -1, to_string(q));
                 Schain = ffc;
                 E_FC = ffc;
             } else
