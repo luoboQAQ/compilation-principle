@@ -93,6 +93,7 @@ public:
         if (isValid)
             return false;
 #ifdef MY_DEBUG
+        cout << "优先函数如下：" << endl;
         cout << "f: ";
         for (int i = 1; i < n; i++)
             cout << f[i] << " ";
