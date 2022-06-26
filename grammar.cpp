@@ -38,7 +38,7 @@ void GrammarAnalysis::program() {
                 cout << "错误的变量定义" << endl;
         }
     } else if (sym1 == 1) {
-        tempstring = symbolTable[symbolIndex - 1].sign.c_str();
+        tempstring = symbolTable[symbolIndex - 1].sign;
         sym1 = symbolTable[symbolIndex++].code;
         if (sym1 == 16) {
             Schain = 0;

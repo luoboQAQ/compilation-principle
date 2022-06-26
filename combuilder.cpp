@@ -37,60 +37,42 @@ void ComBuilder::build() {
             comTable[comIndex].arg2 = "";
             comIndex++;
         } else if (quadTable[i].op == "j>") {
-            comTable[comIndex].op = "CMP";
-            comTable[comIndex].arg1 = quadTable[i].arg1;
-            comTable[comIndex].arg2 = quadTable[i].arg2;
-            comIndex++;
+            buildCMP(i);
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "JA";
             comTable[comIndex].arg1 = "L" + to_string(lTableIndex[atoi(quadTable[i].result.c_str())]);
             comTable[comIndex].arg2 = "";
             comIndex++;
         } else if (quadTable[i].op == "j>=") {
-            comTable[comIndex].op = "CMP";
-            comTable[comIndex].arg1 = quadTable[i].arg1;
-            comTable[comIndex].arg2 = quadTable[i].arg2;
-            comIndex++;
+            buildCMP(i);
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "JAE";
             comTable[comIndex].arg1 = "L" + to_string(lTableIndex[atoi(quadTable[i].result.c_str())]);
             comTable[comIndex].arg2 = "";
             comIndex++;
         } else if (quadTable[i].op == "j<") {
-            comTable[comIndex].op = "CMP";
-            comTable[comIndex].arg1 = quadTable[i].arg1;
-            comTable[comIndex].arg2 = quadTable[i].arg2;
-            comIndex++;
+            buildCMP(i);
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "JB";
             comTable[comIndex].arg1 = "L" + to_string(lTableIndex[atoi(quadTable[i].result.c_str())]);
             comTable[comIndex].arg2 = "";
             comIndex++;
         } else if (quadTable[i].op == "j<=") {
-            comTable[comIndex].op = "CMP";
-            comTable[comIndex].arg1 = quadTable[i].arg1;
-            comTable[comIndex].arg2 = quadTable[i].arg2;
-            comIndex++;
+            buildCMP(i);
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "JBE";
             comTable[comIndex].arg1 = "L" + to_string(lTableIndex[atoi(quadTable[i].result.c_str())]);
             comTable[comIndex].arg2 = "";
             comIndex++;
         } else if (quadTable[i].op == "j==") {
-            comTable[comIndex].op = "CMP";
-            comTable[comIndex].arg1 = quadTable[i].arg1;
-            comTable[comIndex].arg2 = quadTable[i].arg2;
-            comIndex++;
+            buildCMP(i);
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "JE";
             comTable[comIndex].arg1 = "L" + to_string(lTableIndex[atoi(quadTable[i].result.c_str())]);
             comTable[comIndex].arg2 = "";
             comIndex++;
         } else if (quadTable[i].op == "j!=") {
-            comTable[comIndex].op = "CMP";
-            comTable[comIndex].arg1 = quadTable[i].arg1;
-            comTable[comIndex].arg2 = quadTable[i].arg2;
-            comIndex++;
+            buildCMP(i);
             comTable[comIndex].lable = "";
             comTable[comIndex].op = "JNE";
             comTable[comIndex].arg1 = "L" + to_string(lTableIndex[atoi(quadTable[i].result.c_str())]);
@@ -238,4 +220,23 @@ void ComBuilder::printCom() {
     printVariables();
     printStacks();
     printCode();
+}
+
+void ComBuilder::buildCMP(int index) {
+    if (!isdigit(quadTable[index].arg2[0])) {
+        comTable[comIndex].op = "MOV";
+        comTable[comIndex].arg1 = "BX";
+        comTable[comIndex].arg2 = quadTable[index].arg2;
+        comIndex++;
+        comTable[comIndex].lable = "";
+        comTable[comIndex].op = "CMP";
+        comTable[comIndex].arg1 = quadTable[index].arg1;
+        comTable[comIndex].arg2 = "BX";
+        comIndex++;
+    } else {
+        comTable[comIndex].op = "CMP";
+        comTable[comIndex].arg1 = quadTable[index].arg1;
+        comTable[comIndex].arg2 = quadTable[index].arg2;
+        comIndex++;
+    }
 }

@@ -11,6 +11,13 @@ using namespace std;
 //汇编程序生成类
 class ComBuilder {
 private:
+    /**
+     * @brief 生成比较指令
+     *
+     * @param index 四元式下标
+     */
+    void buildCMP(int index);
+
     //打印变量段
     void printVariables();
 
