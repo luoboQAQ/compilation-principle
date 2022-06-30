@@ -35,11 +35,9 @@ bool OperationAnalysis::analyse() {
         if (t == -1) {
             cout << "错误：四则运算语法错误" << endl;
             return false;
-        }
-        if (t == -2) {
+        } else if (t == -2) {
             acc = true;
-        }
-        if (t >= 0 && t < 100) {
+        } else if (t >= 0 && t < 100) {
             s1.emplace(t);
             s2.emplace(sym);
             if (sym == 'i') {
@@ -53,8 +51,7 @@ bool OperationAnalysis::analyse() {
             } else {
                 sym = sym1;
             }
-        }
-        if (t >= 100 && t <= 200) {
+        } else if (t >= 100 && t <= 200) {
             char op = 0;
             switch (t) {
             case 101:

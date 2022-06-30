@@ -65,11 +65,9 @@ bool ConditionalAnalyzer::analyse() {
         if (t == -1) {
             cout << "´íÎó£ºÌõ¼þÓï¾äÓï·¨´íÎó" << endl;
             return false;
-        }
-        if (t == -2) {
+        } else if (t == -2) {
             acc = true;
-        }
-        if (t >= 0 && t < 100) {
+        } else if (t >= 0 && t < 100) {
             s1.emplace(t);
             s2.emplace(sym);
             if (sym == 'i') {
@@ -102,8 +100,7 @@ bool ConditionalAnalyzer::analyse() {
             } else {
                 sym = sym1;
             }
-        }
-        if (t >= 100 && t <= 200)
+        } else if (t >= 100 && t <= 200)
             switch (t) {
             case 101:
                 s1.pop();
@@ -141,20 +138,15 @@ bool ConditionalAnalyzer::analyse() {
                 E_FC = NXQ + 1;
                 if (op == 7) {
                     parser->gen("j<", E1_place, E2_place, "0");
-                }
-                if (op == 8) {
+                } else if (op == 8) {
                     parser->gen("j<=", E1_place, E2_place, "0");
-                }
-                if (op == 9) {
+                } else if (op == 9) {
                     parser->gen("j==", E1_place, E2_place, "0");
-                }
-                if (op == 10) {
+                } else if (op == 10) {
                     parser->gen("j!=", E1_place, E2_place, "0");
-                }
-                if (op == 11) {
+                } else if (op == 11) {
                     parser->gen("j>", E1_place, E2_place, "0");
-                }
-                if (op == 12) {
+                } else if (op == 12) {
                     parser->gen("j>=", E1_place, E2_place, "0");
                 }
                 parser->gen("j", -1, -1, "0");
